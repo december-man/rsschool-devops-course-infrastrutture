@@ -9,7 +9,7 @@ curl -sfL https://get.k3s.io | K3S_TOKEN=${token} sh -s -
 
 # Configure kubeconfig for non-root access
 sudo ln -s /usr/local/bin/k3s /usr/bin/k3s
-mkdir -p ~/.kube
+mkdir ~/.kube
 sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
 sudo chown ec2-user:ec2-user ~/.kube/config
 sudo chmod 600 ~/.kube/config

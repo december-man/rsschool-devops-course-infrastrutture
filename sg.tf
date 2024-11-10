@@ -21,6 +21,17 @@ resource "aws_security_group_rule" "ingress_ssh" {
   protocol          = "tcp"
 }
 
+# Add Ingress Rules to allow http inbound traffic for reverse-proxy setup
+resource "aws_security_group_rule" "ingress_http" {
+  description       = "Allow inbound HTTP traffic to NAT Instance / Bastion Host from specified IP Range"
+  security_group_id = aws_security_group.nat_sg.id
+  type              = "ingress"
+  cidr_blocks       = ["0.0.0.0/0"]
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+}
+
 resource "aws_security_group_rule" "ingress_icmp" {
   description       = "Allow inbound ICMP (Ping) traffic to NAT Instance / Bastion Host"
   security_group_id = aws_security_group.nat_sg.id
@@ -74,7 +85,17 @@ resource "aws_security_group" "k3s_server_sg" {
   }
 }
 
-# Add Ingress Rules to allow ssh inbound traffic to k3s Server
+# Add Ingress Rules to allow specific inbound traffic to k3s Server
+resource "aws_security_group_rule" "ingress_ephemeral_k3s_server" {
+  description       = "Allow inbound traffic to ephemeral ports on k3s Server instance within VPC"
+  security_group_id = aws_security_group.k3s_server_sg.id
+  type              = "ingress"
+  cidr_blocks       = [var.vpc_cidr]
+  from_port         = 30000
+  to_port           = 32767
+  protocol          = "tcp"
+}
+
 resource "aws_security_group_rule" "ingress_ssh_k3s_server" {
   description       = "Allow inbound SSH traffic to k3s Server instance within VPC"
   security_group_id = aws_security_group.k3s_server_sg.id
@@ -146,6 +167,16 @@ resource "aws_security_group_rule" "ingress_ssh_k3s_agent" {
   cidr_blocks       = [var.vpc_cidr]
   from_port         = 22
   to_port           = 22
+  protocol          = "tcp"
+}
+
+resource "aws_security_group_rule" "ingress_ephemeral_k3s_agent" {
+  description       = "Allow inbound traffic to ephemeral ports on k3s Agent instance within VPC"
+  security_group_id = aws_security_group.k3s_agent_sg.id
+  type              = "ingress"
+  cidr_blocks       = [var.vpc_cidr]
+  from_port         = 30000
+  to_port           = 32767
   protocol          = "tcp"
 }
 

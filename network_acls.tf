@@ -8,30 +8,7 @@ resource "aws_network_acl" "public_acl" {
   }
 }
 
-# Add ingress rules to Public ACL to allow ssh & icmp inbound traffic
-resource "aws_network_acl_rule" "ingress_icmp" {
-  network_acl_id = aws_network_acl.public_acl.id
-  rule_number    = 100
-  egress         = false
-  protocol       = "icmp"
-  rule_action    = "allow"
-  cidr_block     = "0.0.0.0/0"
-  icmp_type      = -1
-  icmp_code      = -1
-}
-
-resource "aws_network_acl_rule" "ingress_ssh" {
-  network_acl_id = aws_network_acl.public_acl.id
-  rule_number    = 101
-  egress         = false
-  protocol       = "tcp"
-  rule_action    = "allow"
-  cidr_block     = "0.0.0.0/0"
-  from_port      = 22
-  to_port        = 22
-}
-
-# Allow all inbound traffic, RM if not needed
+# Allow all inbound traffic for now
 resource "aws_network_acl_rule" "ingress_allow_all" {
   network_acl_id = aws_network_acl.public_acl.id
   rule_number    = 200 # Choose a rule number that is higher than existing rules
